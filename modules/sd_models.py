@@ -80,7 +80,7 @@ def list_models():
 
 
 def get_closet_checkpoint_match(searchString):
-    applicable = sorted([info for info in checkpoints_list.values() if searchString in info.title], key = lambda x:len(x.title))
+    applicable = sorted([info for info in checkpoints_list.values() if searchString in info.title], key=lambda x: len(x.title))
     if len(applicable) > 0:
         return applicable[0]
     return None
@@ -131,7 +131,7 @@ def load_model_weights(model, checkpoint_info):
     pl_sd = torch.load(checkpoint_file, map_location="cpu")
     if "global_step" in pl_sd:
         print(f"Global Step: {pl_sd['global_step']}")
-    
+
     if "state_dict" in pl_sd:
         sd = pl_sd["state_dict"]
     else:
@@ -147,7 +147,10 @@ def load_model_weights(model, checkpoint_info):
 
     devices.dtype = torch.float32 if shared.cmd_opts.no_half else torch.float16
 
-    vae_file = os.path.splitext(checkpoint_file)[0] + ".vae.pt"
+    if 'anime' in checkpoint_file:
+        vae_file = os.path.dirname(checkpoint_file) + "/anime.vae.pt"
+    else:
+        vae_file = os.path.splitext(checkpoint_file)[0] + ".vae.pt"
     if os.path.exists(vae_file):
         print(f"Loading VAE weights from: {vae_file}")
         vae_ckpt = torch.load(vae_file, map_location="cpu")
