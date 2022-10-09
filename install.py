@@ -1,4 +1,4 @@
-# this scripts installs necessary requirements and launches main program in webui.py
+# this scripts installs necessary requirements
 import subprocess
 import os
 import sys
@@ -39,7 +39,7 @@ def repo_dir(name):
     return os.path.join(dir_repos, name)
 
 
-def run(command, desc=None, errdesc=None):
+def run_old(command, desc=None, errdesc=None):
     if desc is not None:
         print(desc)
 
@@ -56,6 +56,16 @@ stderr: {result.stderr.decode(encoding="utf8", errors="ignore") if len(result.st
         raise RuntimeError(message)
 
     return result.stdout.decode(encoding="utf8", errors="ignore")
+
+
+def run(command, desc=None, errdesc=None):
+    if desc is not None:
+        print(desc)
+
+    result = subprocess.run(command, shell=True)
+
+    if result.returncode != 0:
+        raise RuntimeError
 
 
 def run_python(code, desc=None, errdesc=None):
@@ -91,7 +101,7 @@ def git_clone(url, dir, name, commithash=None):
         if commithash is None:
             return
 
-        current_hash = run(f'"{git}" -C {dir} rev-parse HEAD', None, f"Couldn't determine {name}'s hash: {commithash}").strip()
+        current_hash = run_old(f'"{git}" -C {dir} rev-parse HEAD', None, f"Couldn't determine {name}'s hash: {commithash}").strip()
         if current_hash == commithash:
             return
 
@@ -106,7 +116,7 @@ def git_clone(url, dir, name, commithash=None):
 
 
 try:
-    commit = run(f"{git} rev-parse HEAD").strip()
+    commit = run_old(f"{git} rev-parse HEAD").strip()
 except Exception:
     commit = "<none>"
 
@@ -150,11 +160,3 @@ sys.argv += args
 if "--exit" in args:
     print("Exiting because of --exit argument")
     exit(0)
-
-def start_webui():
-    print(f"Launching Web UI with arguments: {' '.join(sys.argv[1:])}")
-    import webui
-    webui.webui()
-
-if __name__ == "__main__":
-    start_webui()

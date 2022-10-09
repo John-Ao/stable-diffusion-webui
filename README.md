@@ -1,4 +1,24 @@
-# Stable Diffusion web UI
+# Modified Version
+
+To install, first create a conda environment
+```bash
+conda create -n name_of_the_env python=3.10
+```
+
+Then run
+```bash
+python install.py
+```
+
+Download model checkpoints ([list](https://rentry.org/sdmodels)) to `sd_models` folder.
+
+Now you can launch it by
+```bash
+python run.py --cuda 0 --model sd14 --port 8888
+```
+
+# Stable Diffusion web UI (Original README)
+
 A browser interface based on Gradio library for Stable Diffusion.
 
 ![](txt2img_Screenshot.png)
