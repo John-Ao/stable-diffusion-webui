@@ -9,14 +9,14 @@ contextMenuInit = function(){
 
   function showContextMenu(event,element,menuEntries){
     let posx = event.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
-    let posy = event.clientY + document.body.scrollTop + document.documentElement.scrollTop; 
+    let posy = event.clientY + document.body.scrollTop + document.documentElement.scrollTop;
 
     let oldMenu = gradioApp().querySelector('#context-menu')
     if(oldMenu){
       oldMenu.remove()
     }
 
-    let tabButton = gradioApp().querySelector('button')
+    let tabButton = uiCurrentTab
     let baseStyle = window.getComputedStyle(tabButton)
 
     const contextMenu = document.createElement('nav')
@@ -61,15 +61,15 @@ contextMenuInit = function(){
 
   }
 
-  function appendContextMenuOption(targetEmementSelector,entryName,entryFunction){
-    
-    currentItems = menuSpecs.get(targetEmementSelector)
-    
+  function appendContextMenuOption(targetElementSelector,entryName,entryFunction){
+
+    currentItems = menuSpecs.get(targetElementSelector)
+
     if(!currentItems){
       currentItems = []
-      menuSpecs.set(targetEmementSelector,currentItems);
+      menuSpecs.set(targetElementSelector,currentItems);
     }
-    let newItem = {'id':targetEmementSelector+'_'+uid(), 
+    let newItem = {'id':targetElementSelector+'_'+uid(),
                    'name':entryName,
                    'func':entryFunction,
                    'isNew':true}
@@ -94,10 +94,10 @@ contextMenuInit = function(){
     }
     gradioApp().addEventListener("click", function(e) {
       let source = e.composedPath()[0]
-      if(source.id && source.indexOf('check_progress')>-1){
+      if(source.id && source.id.indexOf('check_progress')>-1){
         return
       }
-      
+
       let oldMenu = gradioApp().querySelector('#context-menu')
       if(oldMenu){
         oldMenu.remove()
@@ -117,54 +117,59 @@ contextMenuInit = function(){
       })
     });
     eventListenerApplied=true
-  
+
   }
 
   return [appendContextMenuOption, removeContextMenuOption, addContextMenuEventListener]
 }
 
-initResponse = contextMenuInit()
-appendContextMenuOption     = initResponse[0]
-removeContextMenuOption     = initResponse[1]
-addContextMenuEventListener = initResponse[2]
+initResponse = contextMenuInit();
+appendContextMenuOption     = initResponse[0];
+removeContextMenuOption     = initResponse[1];
+addContextMenuEventListener = initResponse[2];
 
-
-//Start example Context Menu Items
-generateOnRepeatId = appendContextMenuOption('#txt2img_generate','Generate forever',function(){
-  let genbutton = gradioApp().querySelector('#txt2img_generate');
-  let interruptbutton = gradioApp().querySelector('#txt2img_interrupt');
-  if(!interruptbutton.offsetParent){
-    genbutton.click();
-  }
-  clearInterval(window.generateOnRepeatInterval)
-  window.generateOnRepeatInterval = setInterval(function(){
+(function(){
+  //Start example Context Menu Items
+  let generateOnRepeat = function(genbuttonid,interruptbuttonid){
+    let genbutton = gradioApp().querySelector(genbuttonid);
+    let interruptbutton = gradioApp().querySelector(interruptbuttonid);
     if(!interruptbutton.offsetParent){
       genbutton.click();
     }
-  },
-  500)}
-)
-
-cancelGenerateForever = function(){ 
-  clearInterval(window.generateOnRepeatInterval) 
-  let interruptbutton = gradioApp().querySelector('#txt2img_interrupt');
-  if(interruptbutton.offsetParent){
-      interruptbutton.click();
+    clearInterval(window.generateOnRepeatInterval)
+    window.generateOnRepeatInterval = setInterval(function(){
+      if(!interruptbutton.offsetParent){
+        genbutton.click();
+      }
+    },
+    500)
   }
-}
 
-appendContextMenuOption('#txt2img_interrupt','Cancel generate forever',cancelGenerateForever)
-appendContextMenuOption('#txt2img_generate', 'Cancel generate forever',cancelGenerateForever)
+  appendContextMenuOption('#txt2img_generate','Generate forever',function(){
+    generateOnRepeat('#txt2img_generate','#txt2img_interrupt');
+  })
+  appendContextMenuOption('#img2img_generate','Generate forever',function(){
+    generateOnRepeat('#img2img_generate','#img2img_interrupt');
+  })
 
-
-appendContextMenuOption('#roll','Roll three',
-  function(){ 
-    let rollbutton = gradioApp().querySelector('#roll');
-    setTimeout(function(){rollbutton.click()},100)
-    setTimeout(function(){rollbutton.click()},200)
-    setTimeout(function(){rollbutton.click()},300)
+  let cancelGenerateForever = function(){
+    clearInterval(window.generateOnRepeatInterval)
   }
-)
+
+  appendContextMenuOption('#txt2img_interrupt','Cancel generate forever',cancelGenerateForever)
+  appendContextMenuOption('#txt2img_generate', 'Cancel generate forever',cancelGenerateForever)
+  appendContextMenuOption('#img2img_interrupt','Cancel generate forever',cancelGenerateForever)
+  appendContextMenuOption('#img2img_generate', 'Cancel generate forever',cancelGenerateForever)
+
+  appendContextMenuOption('#roll','Roll three',
+    function(){
+      let rollbutton = get_uiCurrentTabContent().querySelector('#roll');
+      setTimeout(function(){rollbutton.click()},100)
+      setTimeout(function(){rollbutton.click()},200)
+      setTimeout(function(){rollbutton.click()},300)
+    }
+  )
+})();
 //End example Context Menu Items
 
 onUiUpdate(function(){
