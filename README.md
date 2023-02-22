@@ -7,14 +7,28 @@ conda create -n name_of_the_env python=3.10
 
 Then run
 ```bash
-python install.py
+python launch.py
 ```
-
-Download model checkpoints ([list](https://rentry.org/sdmodels)) to `sd_models` folder.
 
 Now you can launch it by
 ```bash
-python run.py --cuda 0 --model sd14 --port 8888
+python run.py --cuda 0 --port 8888
+```
+
+## Optional downloads
+
+Download SD model checkpoints ([list](https://rentry.org/sdmodels)) to `models/Stable-diffusion` folder.
+
+Install [Control Net extension](https://github.com/Mikubill/sd-webui-controlnet), and download checkpoints to `extensions/sd-webui-controlnet/models`.
+```bash
+wget https://huggingface.co/lllyasviel/ControlNet/resolve/main/models/control_sd15_canny.pth
+wget https://huggingface.co/lllyasviel/ControlNet/resolve/main/models/control_sd15_depth.pth
+wget https://huggingface.co/lllyasviel/ControlNet/resolve/main/models/control_sd15_hed.pth
+wget https://huggingface.co/lllyasviel/ControlNet/resolve/main/models/control_sd15_mlsd.pth
+wget https://huggingface.co/lllyasviel/ControlNet/resolve/main/models/control_sd15_normal.pth
+wget https://huggingface.co/lllyasviel/ControlNet/resolve/main/models/control_sd15_openpose.pth
+wget https://huggingface.co/lllyasviel/ControlNet/resolve/main/models/control_sd15_scribble.pth
+wget https://huggingface.co/lllyasviel/ControlNet/resolve/main/models/control_sd15_seg.pth
 ```
 
 # Stable Diffusion web UI (Original README)
